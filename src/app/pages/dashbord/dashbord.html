@@ -1,0 +1,197 @@
+<main class="min-h-screen p-8 bg-gradient-to-br from-gray-50 to-gray-100/80">
+
+  <!-- HEADER -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+          Tableau de bord
+        </h2>
+        <p class="text-gray-500 text-sm mt-1 flex items-center gap-2">
+          <span class="inline-block w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+          Vue globale de la pharmacie - {{ todayDate }}
+        </p>
+      </div>
+      <button class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:shadow-md transition-all duration-200 flex items-center gap-2">
+        <span>🔄</span>
+        Actualiser
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING STATE -->
+  <div *ngIf="loading()" class="flex items-center justify-center py-20">
+    <div class="flex flex-col items-center gap-4">
+      <div class="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-gray-500 text-sm">Chargement des données...</p>
+    </div>
+  </div>
+
+  <!-- STATS CARDS -->
+  <div *ngIf="!loading()" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+    <div class="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-500">Produits</p>
+          <h3 class="text-3xl font-bold text-blue-600 mt-2">
+            {{ stats()?.produits || 0 }}
+          </h3>
+          <p class="text-xs text-gray-400 mt-1">Total en stock</p>
+        </div>
+        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+          <span class="text-2xl">💊</span>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-gray-100 flex items-center gap-2">
+        <span class="text-xs text-green-600">+12%</span>
+        <span class="text-xs text-gray-400">vs mois dernier</span>
+      </div>
+    </div>
+
+    <div class="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-500">Ventes</p>
+          <h3 class="text-3xl font-bold text-green-600 mt-2">
+            {{ stats()?.ventes || 0 }}
+          </h3>
+          <p class="text-xs text-gray-400 mt-1">Ce mois</p>
+        </div>
+        <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+          <span class="text-2xl">📈</span>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-gray-100 flex items-center gap-2">
+        <span class="text-xs text-green-600">+8.2%</span>
+        <span class="text-xs text-gray-400">vs mois dernier</span>
+      </div>
+    </div>
+
+    <div class="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-500">Stock faible</p>
+          <h3 class="text-3xl font-bold text-red-600 mt-2">
+            {{ stats()?.stock_faible || 0 }}
+          </h3>
+          <p class="text-xs text-gray-400 mt-1">À réapprovisionner</p>
+        </div>
+        <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+          <span class="text-2xl">⚠️</span>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-gray-100">
+        <span class="text-xs text-red-600">{{ stats()?.stock_faible || 0 }} produits critiques</span>
+      </div>
+    </div>
+
+    <div class="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-500">Chiffre d'affaires</p>
+          <h3 class="text-3xl font-bold text-purple-600 mt-2">
+            {{ formatNumber(stats()?.ca) }} <span class="text-lg">FC</span>
+          </h3>
+          <p class="text-xs text-gray-400 mt-1">Total général</p>
+        </div>
+        <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+          <span class="text-2xl">💰</span>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-gray-100 flex items-center gap-2">
+        <span class="text-xs text-purple-600">+23.5%</span>
+        <span class="text-xs text-gray-400">vs mois dernier</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- STOCK FAIBLE SECTION -->
+  <div class="mt-10">
+
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h3 class="text-xl font-bold text-gray-800 flex items-center gap-3">
+          <span class="w-1.5 h-8 bg-red-500 rounded-full"></span>
+          Produits en stock faible
+          <span class="text-sm font-normal text-gray-400">
+            ({{ stockFaibleList().length }} produits)
+          </span>
+        </h3>
+        <p class="text-sm text-gray-500 mt-1">Produits nécessitant un réapprovisionnement</p>
+      </div>
+      <button class="text-sm text-green-600 font-medium hover:text-green-700 transition-colors flex items-center gap-1">
+        Voir tout
+        <span>→</span>
+      </button>
+    </div>
+
+    <div *ngIf="stockFaibleList().length === 0 && !loading()" class="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+      <div class="flex flex-col items-center gap-3">
+        <span class="text-5xl">🎉</span>
+        <p class="text-gray-500 font-medium">Aucun produit en stock faible</p>
+        <p class="text-sm text-gray-400">Tous les produits sont bien approvisionnés</p>
+      </div>
+    </div>
+
+    <div *ngIf="stockFaibleList().length > 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+
+          <thead class="bg-gradient-to-r from-gray-50 to-gray-100/80 text-sm">
+            <tr>
+              <th class="p-4 font-semibold text-gray-600">Produit</th>
+              <th class="p-4 font-semibold text-gray-600">Catégorie</th>
+              <th class="p-4 font-semibold text-gray-600">Emplacement</th>
+              <th class="p-4 font-semibold text-gray-600 text-center">Quantité</th>
+              <th class="p-4 font-semibold text-gray-600 text-right">Prix unitaire</th>
+              <th class="p-4 font-semibold text-gray-600 text-center">Statut</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let p of stockFaibleList()" class="border-t border-gray-50 hover:bg-red-50/30 transition-colors duration-150">
+              <td class="p-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center text-lg">
+                    💊
+                  </div>
+                  <div>
+                    <p class="font-medium text-gray-800">{{ p.name }}</p>
+                    <p class="text-xs text-gray-400">Ref: {{ p.reference || 'N/A' }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="p-4">
+                <span class="px-3 py-1 bg-gray-100 rounded-full text-xs font-medium text-gray-600">
+                  {{ p.category }}
+                </span>
+              </td>
+              <td class="p-4 text-sm text-gray-600">{{ p.emplacement }}</td>
+              <td class="p-4 text-center">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-bold">
+                  <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
+                  {{ p.quantite }}
+                </span>
+              </td>
+              <td class="p-4 text-right font-medium text-gray-700">
+                {{ formatNumber(p.price) }} FC
+              </td>
+              <td class="p-4 text-center">
+                <button class="px-3 py-1.5 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-sm hover:shadow-md">
+                  Réapprovisionner
+                </button>
+              </td>
+            </tr>
+          </tbody>
+
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+</main>

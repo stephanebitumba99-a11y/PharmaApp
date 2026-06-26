@@ -1,0 +1,198 @@
+<main class="min-h-screen flex items-center justify-center px-4 py-8 bg-gradient-to-br from-gray-50 to-gray-100/80 font-sans text-gray-800">
+
+  <div class="w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-gray-100 p-8 md:p-10 animate-slideUp">
+
+    <!-- HEADER -->
+    <div class="mb-8 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg mb-4">
+        <span class="text-3xl text-white">➕</span>
+      </div>
+      <h1 class="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+        Ajouter un produit
+      </h1>
+      <p class="text-sm text-gray-500 mt-2 flex items-center justify-center gap-2">
+        <span class="inline-block w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+        Remplissez les informations du produit
+      </p>
+    </div>
+
+    <!-- FORM -->
+    <form #productForm="ngForm" (ngSubmit)="submit()" class="space-y-5">
+
+      <!-- ROW: NAME + CATEGORY -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- NAME -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Nom du produit <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="produit.name"
+            name="name"
+            required
+            minlength="2"
+            #nameInput="ngModel"
+            placeholder="Ex: Paracétamol 500mg"
+            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-200 text-sm"
+            [class.border-red-400]="nameInput.invalid && nameInput.touched"
+          >
+          <p *ngIf="nameInput.invalid && nameInput.touched" class="text-xs text-red-500 mt-1">
+            <span *ngIf="nameInput.errors?.['required']">Le nom est requis</span>
+            <span *ngIf="nameInput.errors?.['minlength']">Minimum 2 caractères</span>
+          </p>
+        </div>
+
+        <!-- CATEGORY -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Catégorie <span class="text-red-500">*</span>
+          </label>
+          <select
+            [(ngModel)]="produit.category"
+            name="category"
+            required
+            #categoryInput="ngModel"
+            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-200 text-sm appearance-none"
+            [class.border-red-400]="categoryInput.invalid && categoryInput.touched"
+          >
+            <option value="" disabled>Sélectionnez une catégorie</option>
+            <option value="Médicaments">🦟 Antipaludiques</option>
+            <option value="Parapharmacie">🦠 Antibiotiques</option>
+            <option value="Hygiène">🌡️ Antipyrétiques / Antalgiques</option>
+            <option value="Cosmétique">🫁 Antitussifs / Respiratoires</option>
+            <option value="Autre">💓 Antihypertenseurs / Cardiovasculaires</option>
+          </select>
+          <p *ngIf="categoryInput.invalid && categoryInput.touched" class="text-xs text-red-500 mt-1">
+            La catégorie est requise
+          </p>
+        </div>
+      </div>
+
+      <!-- ROW: QUANTITY + PRICE -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- QUANTITE -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Quantité <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="number"
+            [(ngModel)]="produit.quantite"
+            name="quantite"
+            required
+            min="0"
+            #quantiteInput="ngModel"
+            placeholder="0"
+            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-200 text-sm"
+            [class.border-red-400]="quantiteInput.invalid && quantiteInput.touched"
+          >
+          <p *ngIf="quantiteInput.invalid && quantiteInput.touched" class="text-xs text-red-500 mt-1">
+            <span *ngIf="quantiteInput.errors?.['required']">La quantité est requise</span>
+            <span *ngIf="quantiteInput.errors?.['min']">La quantité doit être ≥ 0</span>
+          </p>
+        </div>
+
+        <!-- PRICE -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Prix unitaire <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">FC</span>
+            <input
+              type="number"
+              [(ngModel)]="produit.price"
+              name="price"
+              required
+              min="0"
+              step="0.01"
+              #priceInput="ngModel"
+              placeholder="0.00"
+              class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-200 text-sm"
+              [class.border-red-400]="priceInput.invalid && priceInput.touched"
+            >
+          </div>
+          <p *ngIf="priceInput.invalid && priceInput.touched" class="text-xs text-red-500 mt-1">
+            <span *ngIf="priceInput.errors?.['required']">Le prix est requis</span>
+            <span *ngIf="priceInput.errors?.['min']">Le prix doit être ≥ 0</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- ROW: EMPLACEMENT + DATE -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- EMPLACEMENT -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Emplacement <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="produit.emplacement"
+            name="emplacement"
+            required
+            #emplacementInput="ngModel"
+            placeholder="Ex: Rayon A3"
+            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-200 text-sm"
+            [class.border-red-400]="emplacementInput.invalid && emplacementInput.touched"
+          >
+          <p *ngIf="emplacementInput.invalid && emplacementInput.touched" class="text-xs text-red-500 mt-1">
+            L'emplacement est requis
+          </p>
+        </div>
+
+        <!-- DATE EXPIRATION -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+            Date d'expiration <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="date"
+            [(ngModel)]="produit.date_expiration"
+            name="date_expiration"
+            required
+            [min]="today"
+            #dateInput="ngModel"
+            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-200 text-sm"
+            [class.border-red-400]="dateInput.invalid && dateInput.touched"
+          >
+          <p *ngIf="dateInput.invalid && dateInput.touched" class="text-xs text-red-500 mt-1">
+            <span *ngIf="dateInput.errors?.['required']">La date d'expiration est requise</span>
+            <span *ngIf="dateInput.errors?.['min']">La date doit être dans le futur</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- MESSAGE ERREUR -->
+      <div *ngIf="message" class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
+        <span class="text-xl">⚠️</span>
+        <p class="text-sm text-red-600">{{ message }}</p>
+      </div>
+
+      <!-- BUTTONS -->
+      <div class="flex flex-col sm:flex-row gap-3 pt-4">
+        <button
+          type="submit"
+          [disabled]="productForm.invalid || isLoading"
+          class="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white py-3.5 rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-md hover:shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          <span *ngIf="!isLoading">➕ Ajouter le produit</span>
+          <span *ngIf="isLoading" class="flex items-center gap-2">
+            <span class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            Ajout en cours...
+          </span>
+        </button>
+
+        <a routerLink="/layout/produit"
+           class="px-6 py-3.5 text-center bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 text-sm font-medium text-gray-600 flex items-center justify-center gap-2">
+          <span>✕</span>
+          Annuler
+        </a>
+      </div>
+
+    </form>
+
+  </div>
+
+</main>

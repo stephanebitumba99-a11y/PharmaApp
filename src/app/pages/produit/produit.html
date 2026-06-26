@@ -1,0 +1,279 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100/80 text-gray-800 p-8 space-y-8">
+
+  <!-- HEADER -->
+  <header class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+
+    <div>
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+          <span class="text-2xl text-white">💊</span>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+            Nos produits
+          </h1>
+          <p class="text-gray-500 text-sm flex items-center gap-2 mt-1">
+            <span class="inline-block w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+            Gestion des produits de la pharmacie
+            <span class="text-xs bg-gray-200 px-2 py-0.5 rounded-full">{{ filteredProduits().length }} produits</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEARCH & ACTIONS -->
+    <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+
+      <!-- SEARCH -->
+      <div class="relative flex-1 lg:w-80">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔍</span>
+        <input
+          type="text"
+          (input)="updateSearch($event)"
+          placeholder="Rechercher un produit..."
+          class="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-200 text-sm shadow-sm"
+        />
+        <button *ngIf="search().length > 0" 
+                (click)="clearSearch()"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+          ✕
+        </button>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="flex gap-2">
+        <button routerLink="/produitform"
+                class="bg-gradient-to-r from-green-600 to-green-700 text-white px-5 py-2.5 rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2 whitespace-nowrap text-sm font-medium">
+          <span>➕</span>
+          Ajouter
+        </button>
+
+        <button class="bg-white border border-gray-200 px-4 py-2.5 rounded-xl hover:bg-gray-50 hover:shadow-md transition-all duration-200 flex items-center gap-2 text-sm font-medium text-gray-600">
+          <span>📥</span>
+          Export
+        </button>
+      </div>
+
+    </div>
+
+  </header>
+
+  <!-- STATS BAR -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+      <p class="text-xs text-gray-400 font-medium uppercase tracking-wider">Total</p>
+      <p class="text-2xl font-bold text-gray-800">{{ produits().length }}</p>
+    </div>
+    <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+      <p class="text-xs text-gray-400 font-medium uppercase tracking-wider">En stock</p>
+      <p class="text-2xl font-bold text-green-600">{{ getStockCount() }}</p>
+    </div>
+    <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+      <p class="text-xs text-gray-400 font-medium uppercase tracking-wider">Stock faible</p>
+      <p class="text-2xl font-bold text-yellow-600">{{ getLowStockCount() }}</p>
+    </div>
+    <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+      <p class="text-xs text-gray-400 font-medium uppercase tracking-wider">Rupture</p>
+      <p class="text-2xl font-bold text-red-600">{{ getOutOfStockCount() }}</p>
+    </div>
+  </div>
+
+  <!-- TABLE CARD -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+    <!-- TABLE HEADER WITH FILTERS -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-b border-gray-100 bg-gray-50/50">
+      <div class="flex items-center gap-3">
+        <span class="text-sm font-medium text-gray-600">📋 Liste des produits</span>
+        <span class="text-xs text-gray-400">|</span>
+        <span class="text-xs text-gray-400">{{ filteredProduits().length }} affichés</span>
+      </div>
+      <div class="flex items-center gap-2 mt-2 sm:mt-0">
+        <select class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none">
+          <option>Toutes les catégories</option>
+          <option>Médicaments</option>
+          <option>Parapharmacie</option>
+          <option>Hygiène</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+
+        <!-- HEADER -->
+        <thead class="bg-gray-50 text-gray-600 uppercase text-xs tracking-wider">
+          <tr>
+            <th class="p-4 text-left font-semibold">Produit</th>
+            <th class="p-4 text-left font-semibold">Catégorie</th>
+            <th class="p-4 text-left font-semibold">Prix</th>
+            <th class="p-4 text-left font-semibold">Emplacement</th>
+            <th class="p-4 text-center font-semibold">Quantité</th>
+            <th class="p-4 text-left font-semibold">Statut</th>
+            <th class="p-4 text-left font-semibold">Expiration</th>
+            <th class="p-4 text-center font-semibold">Actions</th>
+          </tr>
+        </thead>
+
+        <!-- BODY -->
+        <tbody>
+
+          <!-- Empty State -->
+          <tr *ngIf="filteredProduits().length === 0">
+            <td colspan="8" class="p-12 text-center">
+              <div class="flex flex-col items-center gap-3">
+                <span class="text-6xl">🔍</span>
+                <p class="text-gray-500 font-medium">Aucun produit trouvé</p>
+                <p class="text-sm text-gray-400">Essayez de modifier votre recherche</p>
+              </div>
+            </td>
+          </tr>
+
+          <tr
+            *ngFor="let p of filteredProduits()"
+            class="border-t border-gray-50 hover:bg-green-50/30 transition-all duration-150 group"
+          >
+
+            <!-- NOM -->
+            <td class="p-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-lg group-hover:scale-110 transition-transform duration-200">
+                  💊
+                </div>
+                <div>
+                  <p class="font-medium text-gray-800">{{ p.name }}</p>
+                  <p class="text-xs text-gray-400">Ref: {{ p.reference || 'N/A' }}</p>
+                </div>
+              </div>
+            </td>
+
+            <!-- CATEGORIE -->
+            <td class="p-4">
+              <span class="px-3 py-1 bg-gray-100 rounded-full text-xs font-medium text-gray-600">
+                {{ p.category }}
+              </span>
+            </td>
+
+            <!-- PRIX -->
+            <td class="p-4 font-semibold text-gray-700">
+              {{ formatNumber(p.price) }} <span class="text-xs text-gray-400">FC</span>
+            </td>
+
+            <!-- EMPLACEMENT -->
+            <td class="p-4 text-gray-600 text-sm">
+              <span class="flex items-center gap-1">
+                📍 {{ p.Emplacement }}
+              </span>
+            </td>
+
+            <!-- QUANTITE -->
+            <td class="p-4 text-center">
+              <span class="inline-flex items-center justify-center min-w-[40px] px-2 py-1 rounded-lg font-bold text-sm"
+                    [ngClass]="{
+                      'bg-red-100 text-red-700': p.quantite === 0,
+                      'bg-yellow-100 text-yellow-700': p.quantite > 0 && p.quantite < 10,
+                      'bg-green-100 text-green-700': p.quantite >= 10
+                    }">
+                {{ p.quantite }}
+              </span>
+            </td>
+
+            <!-- STATUT -->
+            <td class="p-4">
+              <span
+                class="px-3 py-1.5 text-xs font-semibold rounded-full"
+                [ngClass]="{
+                  'bg-red-100 text-red-700': p.quantite === 0,
+                  'bg-yellow-100 text-yellow-700': p.quantite > 0 && p.quantite < 10,
+                  'bg-green-100 text-green-700': p.quantite >= 10
+                }"
+              >
+                <span class="inline-block w-1.5 h-1.5 rounded-full mr-1.5"
+                      [ngClass]="{
+                        'bg-red-500': p.quantite === 0,
+                        'bg-yellow-500': p.quantite > 0 && p.quantite < 10,
+                        'bg-green-500': p.quantite >= 10
+                      }">
+                </span>
+                {{
+                  p.quantite === 0
+                    ? 'RUPTURE'
+                    : p.quantite < 10
+                    ? 'FAIBLE'
+                    : 'OK'
+                }}
+              </span>
+            </td>
+
+            <!-- EXPIRATION -->
+            <td class="p-4">
+              <span
+                class="px-3 py-1.5 text-xs font-semibold rounded-full"
+                [ngClass]="{
+                  'bg-red-100 text-red-700': isExpiringSoon(p.date_expiration),
+                  'bg-green-100 text-green-700': !isExpiringSoon(p.date_expiration) && p.date_expiration,
+                  'bg-gray-100 text-gray-400': !p.date_expiration
+                }"
+              >
+                {{
+                  isExpiringSoon(p.date_expiration)
+                    ? '⚠️ EXPIRATION'
+                    : p.date_expiration 
+                    ? (p.date_expiration | date:'dd/MM/yyyy')
+                    : 'N/A'
+                }}
+              </span>
+            </td>
+
+            <!-- ACTIONS -->
+            <td class="p-4 text-center">
+              <div class="flex items-center justify-center gap-1">
+                <button class="p-1.5 hover:bg-blue-50 rounded-lg transition-colors text-blue-600" title="Modifier">
+                  ✏️
+                </button>
+                <button class="p-1.5 hover:bg-red-50 rounded-lg transition-colors text-red-600" title="Supprimer">
+                  🗑️
+                </button>
+              </div>
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+    </div>
+
+    <!-- TABLE FOOTER -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-t border-gray-100 bg-gray-50/50 text-xs text-gray-500">
+      <div>
+        Affichage de {{ filteredProduits().length }} produit{{ filteredProduits().length > 1 ? 's' : '' }}
+      </div>
+<div class="flex items-center gap-2 mt-2 sm:mt-0">
+
+  <button
+    (click)="prevPage()"
+    class="px-3 py-1 bg-white border rounded-lg hover:bg-gray-50 transition"
+    [disabled]="currentPage() === 1"
+  >
+    ←
+  </button>
+
+  <span class="px-3 py-1 bg-green-600 text-white rounded-lg">
+    {{ currentPage() }} / {{ totalPages() }}
+  </span>
+
+  <button
+    (click)="nextPage()"
+    class="px-3 py-1 bg-white border rounded-lg hover:bg-gray-50 transition"
+    [disabled]="currentPage() === totalPages()"
+  >
+    →
+  </button>
+
+</div>
+    </div>
+
+  </div>
+
+</div>
