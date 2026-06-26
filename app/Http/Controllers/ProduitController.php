@@ -8,13 +8,31 @@ use App\Models\Produit;
 class ProduitController extends Controller
 {
 
-public function index()
+public function index(Request $request)
 {
-    $produits = Produit::all();
+    $query = Produit::query();
+
+    // 🔎 Recherche
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where('name', 'like', "%{$search}%")
+              ->orWhere('category', 'like', "%{$search}%")
+              ->orWhere('Emplacement', 'like', "%{$search}%");
+    }
+
+    // 📦 Pagination
+    $produits = $query->paginate(10);
 
     return response()->json([
-        'data' => $produits
-    ], 200);
+        'data' => $produits->items(),
+        'meta' => [
+            'current_page' => $produits->currentPage(),
+            'last_page' => $produits->lastPage(),
+            'per_page' => $produits->perPage(),
+            'total' => $produits->total(),
+        ]
+    ]);
 }
 
     /**
