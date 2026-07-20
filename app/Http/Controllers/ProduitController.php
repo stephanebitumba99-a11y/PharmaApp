@@ -11,8 +11,6 @@ class ProduitController extends Controller
 public function index(Request $request)
 {
     $query = Produit::query();
-
-    // 🔎 Recherche
     if ($request->filled('search')) {
         $search = $request->search;
 
@@ -21,7 +19,7 @@ public function index(Request $request)
               ->orWhere('Emplacement', 'like', "%{$search}%");
     }
 
-    // 📦 Pagination
+    
     $produits = $query->paginate(10);
 
     return response()->json([
