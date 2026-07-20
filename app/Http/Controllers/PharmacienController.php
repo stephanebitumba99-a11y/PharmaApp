@@ -5,6 +5,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Pharmacien;
 
+
 class PharmacienController extends Controller
 {
     /**
@@ -29,7 +30,6 @@ class PharmacienController extends Controller
             'user_id' => 'nullable|exists:users,id'
         ]);
 
-        // 🔥 LOGIQUE PROPRE
         if (empty($validated['user_id'])) {
 
             $firstUser = User::first();
@@ -50,9 +50,7 @@ class PharmacienController extends Controller
             'data' => $pharmacien
         ], 201);
     }
-    /**
-     * Afficher un seul
-     */
+    
     public function show($id)
     {
         $pharmacien = Pharmacien::with('user')->find($id);
@@ -66,9 +64,7 @@ class PharmacienController extends Controller
         return response()->json($pharmacien);
     }
 
-    /**
-     * Mise à jour
-     */
+    
     public function update(Request $request, $id)
     {
         $pharmacien = Pharmacien::find($id);
@@ -96,9 +92,7 @@ class PharmacienController extends Controller
         ]);
     }
 
-    /**
-     * Suppression
-     */
+    
     public function destroy($id)
     {
         $pharmacien = Pharmacien::find($id);
