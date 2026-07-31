@@ -4,46 +4,78 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Produit;
+use App\Imports\ProduitsImport;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class ProduitController extends Controller
 {
 
-public function index(Request $request)
-{
-    $query = Produit::query();
-    if ($request->filled('search')) {
-        $search = $request->search;
+    public function index(Request $request)
+    {
+        $query = Produit::query();
+        
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('name', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%")
+                  ->orWhere('emplacement', 'like', "%{$search}%"); 
+        }
 
-        $query->where('name', 'like', "%{$search}%")
-              ->orWhere('category', 'like', "%{$search}%")
-              ->orWhere('Emplacement', 'like', "%{$search}%");
+        $produits = $query->paginate(10);
+
+        
+        $formattedData = $produits->items();
+
+        return response()->json([
+            'data' => $formattedData,
+            'meta' => [
+                'current_page' => $produits->currentPage(),
+                'last_page' => $produits->lastPage(),
+                'per_page' => $produits->perPage(),
+                'total' => $produits->total(),
+            ]
+        ]);
     }
-
-    
-    $produits = $query->paginate(10);
-
-    return response()->json([
-        'data' => $produits->items(),
-        'meta' => [
-            'current_page' => $produits->currentPage(),
-            'last_page' => $produits->lastPage(),
-            'per_page' => $produits->perPage(),
-            'total' => $produits->total(),
-        ]
-    ]);
-}
 
     /**
      * Création
      */
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240', // Max 10 Mo
+        ]);
+
+        try {
+            Excel::import(new ProduitsImport, $request->file('file'));
+
+            return response()->json([
+                'message' => 'Produits importés avec succès !'
+            ], 200);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            
+            return response()->json([
+                'message' => 'Erreur de validation lors de l\'importation',
+                'errors'  => $failures
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Une erreur est survenue lors de l\'importation',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'quantite' => 'required|integer|min:0',
-            'price' => 'required|numeric|min:0',  
-            'emplacement'=>'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'emplacement' => 'required|string|max:255',
             'date_expiration' => 'nullable|date'
         ]);
 
@@ -68,7 +100,9 @@ public function index(Request $request)
             ], 404);
         }
 
-        return response()->json($produit);
+        return response()->json([
+            'data' => $produit  // ✅ Envelopper dans 'data' pour cohérence
+        ]);
     }
 
     /**
