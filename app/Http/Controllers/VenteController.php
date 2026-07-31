@@ -202,7 +202,6 @@ class VenteController extends Controller
             'total' => $ventes->sum('total')
         ]);
     }
-
     
     public function stats()
     {
