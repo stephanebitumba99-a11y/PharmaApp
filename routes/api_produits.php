@@ -5,3 +5,4 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::apiResource('produits', ProduitController::class);
+Route::post('/produits/import', [ProduitController::class, 'import']);
