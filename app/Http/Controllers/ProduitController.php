@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProduitResource;
 use Illuminate\Http\Request;
 use App\Models\Produit;
 use App\Imports\ProduitsImport;
@@ -10,31 +11,31 @@ class ProduitController extends Controller
 {
 
     public function index(Request $request)
-    {
-        $query = Produit::query();
-        
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where('name', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%")
-                  ->orWhere('emplacement', 'like', "%{$search}%"); 
-        }
+{
+    $query = Produit::query();
 
-        $produits = $query->paginate(10);
+    if ($request->filled('search')) {
+        $search = $request->search;
 
-        
-        $formattedData = $produits->items();
-
-        return response()->json([
-            'data' => $formattedData,
-            'meta' => [
-                'current_page' => $produits->currentPage(),
-                'last_page' => $produits->lastPage(),
-                'per_page' => $produits->perPage(),
-                'total' => $produits->total(),
-            ]
-        ]);
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('category', 'like', "%{$search}%")
+              ->orWhere('emplacement', 'like', "%{$search}%");
+        });
     }
+
+    $produits = $query->paginate(10);
+
+    return response()->json([
+        'data' => ProduitResource::collection($produits->items()),
+        'meta' => [
+            'current_page' => $produits->currentPage(),
+            'last_page' => $produits->lastPage(),
+            'per_page' => $produits->perPage(),
+            'total' => $produits->total(),
+        ]
+    ]);
+}
 
     public function import(Request $request)
     {
