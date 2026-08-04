@@ -12,7 +12,6 @@ require __DIR__.'/api_pharmaciens.php';
 require __DIR__.'/api_users.php';
 require __DIR__.'/api_auth.php';
 require __DIR__.'/api_produits.php';
-require __DIR__.'/api_ventes.php';
-
+require __DIR__.'/api_setting.php';
 
 Route::get('/dashbord', [DashboardController::class, 'stats']);

@@ -6,8 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Produit;
 use App\Imports\ProduitsImport;
 use Maatwebsite\Excel\Facades\Excel;
-
-
 class ProduitController extends Controller
 {
 
@@ -38,14 +36,10 @@ class ProduitController extends Controller
         ]);
     }
 
-    /**
-     * Création
-     */
-
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv|max:10240', // Max 10 Mo
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240',
         ]);
 
         try {
@@ -87,9 +81,6 @@ class ProduitController extends Controller
         ], 201);
     }
 
-    /**
-     * Afficher un produit
-     */
     public function show($id)
     {
         $produit = Produit::find($id);
@@ -101,13 +92,10 @@ class ProduitController extends Controller
         }
 
         return response()->json([
-            'data' => $produit  // ✅ Envelopper dans 'data' pour cohérence
+            'data' => $produit  
         ]);
     }
 
-    /**
-     * Mise à jour
-     */
     public function update(Request $request, $id)
     {
         $produit = Produit::find($id);
@@ -135,9 +123,6 @@ class ProduitController extends Controller
         ]);
     }
 
-    /**
-     * Suppression
-     */
     public function destroy($id)
     {
         $produit = Produit::find($id);
